@@ -5,6 +5,7 @@
     "json-server": "^0.9.4",
     "jsonapi-serializer": "^3.4.2",
     "lodash": "^4.17.3",
+    "pluralize": "^3.1.0",
     "sync-request": "^3.0.1"
   }
 }

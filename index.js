@@ -2,6 +2,8 @@ const faker = require('faker');
 const request = require('sync-request');
 const _ = require('lodash');
 const JSONAPISerializer = require('jsonapi-serializer').Serializer;
+const pluralize = require('pluralize')
+
 
 const postCache = []
 
@@ -83,15 +85,25 @@ var router = jsonServer.router(giveMeMyData())
 var middlewares = jsonServer.defaults()
 
 router.render = function (req, res) {
+  const type = _.last(req.path.split('/'))
+  const singularType = pluralize.singular(type)
   const rawData = res.locals.data;
   const responseObject = _.isArray(rawData)? rawData[0] : rawData;
-
-  console.log(res.header()._headers.link)
-
-  const serializer = new JSONAPISerializer('users', {
-    attributes: Object.keys(responseObject)
+  const serializer = new JSONAPISerializer(singularType, {
+    attributes: Object.keys(responseObject),
+    dataLinks: {
+      self: (_, obj) => { return `/${type}/${obj.id}`; }
+    },
+    topLevelLinks: {
+      first: `/${type}?page=1`,
+      prev: `/${type}?page=2`,
+      next: `/${type}?page=4`,
+      last: `/${type}?page=10`
+    },
+    pluralizeType: false
   });
   const serialized_data = serializer.serialize(rawData);
+  serialized_data.jsonapi = "1.0";
   res.jsonp(serialized_data);
 }
 
