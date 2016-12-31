@@ -8,9 +8,9 @@ const pluralize = require('pluralize')
 const postCache = []
 
 function getPostFromTheMatrix() {
-  // const res = request('GET', 'https://jaspervdj.be/lorem-markdownum/markdown.txt');
-  // return res.getBody().toString();
-  return "jijijijijijiji"
+  const res = request('GET', 'https://jaspervdj.be/lorem-markdownum/markdown.txt');
+  return res.getBody().toString();
+  // return "jijijijijijiji"
 }
 
 function getPostBody() {
@@ -85,7 +85,7 @@ var router = jsonServer.router(giveMeMyData())
 var middlewares = jsonServer.defaults()
 
 router.render = function (req, res) {
-  const type = _.last(req.path.split('/'))
+  const type = req.path.split('/')[1]
   const singularType = pluralize.singular(type)
   const rawData = res.locals.data;
   const responseObject = _.isArray(rawData)? rawData[0] : rawData;
@@ -99,8 +99,7 @@ router.render = function (req, res) {
       prev: `/${type}?page=2`,
       next: `/${type}?page=4`,
       last: `/${type}?page=10`
-    },
-    pluralizeType: false
+    }
   });
   const serialized_data = serializer.serialize(rawData);
   serialized_data.jsonapi = "1.0";
